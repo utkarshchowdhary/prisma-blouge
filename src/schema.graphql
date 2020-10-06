@@ -1,0 +1,200 @@
+type Query {
+  users(
+    filter: String
+    cursor: ID
+    take: Int = 50
+    limit: UserLimitByInput
+    orderBy: UserOrderByInput
+  ): UserGob!
+  posts(
+    filter: String
+    page: Int = 1
+    take: Int = 50
+    limit: PostLimitByInput
+    orderBy: PostOrderByInput
+  ): PostGob!
+  ownPosts(
+    filter: String
+    page: Int = 1
+    take: Int = 50
+    limit: OwnPostLimitByInput
+    orderBy: PostOrderByInput
+  ): PostGob!
+  comments(
+    filter: String
+    page: Int = 1
+    take: Int = 50
+    limit: CommentLimitByInput
+    orderBy: CommentOrderByInput
+  ): CommentGob!
+  post(id: ID!): Post!
+  me: User!
+}
+
+type Mutation {
+  createUser(data: CreateUserInput!): AuthPayload!
+  login(data: LoginUserInput!): AuthPayload!
+  deleteUser: User!
+  updateUser(data: UpdateUserInput): User!
+  createPost(data: CreatePostInput!): Post!
+  deletePost(id: ID!): Post!
+  updatePost(id: ID!, data: UpdatePostInput): Post!
+  createComment(data: CreateCommentInput): Comment!
+  deleteComment(id: ID!): Comment!
+  updateComment(id: ID!, data: UpdateCommentInput): Comment!
+}
+
+type Subscription {
+  comment(postId: ID!): CommentSubscriptionPayload!
+  post: PostSubscriptionPayload!
+  ownPost: PostSubscriptionPayload!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String
+  createdAt: String!
+  updatedAt: String!
+  posts: [Post!]!
+  comments: [Comment!]!
+}
+
+type Post {
+  id: ID!
+  title: String!
+  body: String!
+  published: Boolean!
+  createdAt: String!
+  updatedAt: String!
+  author: User!
+  comments: [Comment!]!
+}
+
+type Comment {
+  id: ID!
+  text: String!
+  createdAt: String!
+  updatedAt: String!
+  author: User!
+  post: Post!
+}
+
+type UserGob {
+  count: Int!
+  users: [User!]!
+}
+
+type PostGob {
+  count: Int!
+  posts: [Post!]!
+}
+
+type CommentGob {
+  count: Int!
+  comments: [Comment!]!
+}
+
+input UserLimitByInput {
+  name: String
+}
+
+input PostLimitByInput {
+  title: String
+  body: String
+}
+
+input OwnPostLimitByInput {
+  title: String
+  body: String
+  published: Boolean
+}
+
+input CommentLimitByInput {
+  text: String
+}
+
+input UserOrderByInput {
+  name: Sort
+  email: String
+  createdAt: Sort
+  updatedAt: Sort
+}
+
+input PostOrderByInput {
+  title: Sort
+  body: Sort
+  published: Sort
+  createdAt: Sort
+  updatedAt: Sort
+}
+
+input CommentOrderByInput {
+  text: Sort
+  createdAt: Sort
+  updatedAt: Sort
+}
+
+enum Sort {
+  asc
+  desc
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+  password: String
+}
+
+input CreatePostInput {
+  title: String!
+  body: String!
+  published: Boolean
+}
+
+input UpdatePostInput {
+  title: String
+  body: String
+  published: Boolean
+}
+
+input CreateCommentInput {
+  text: String!
+  post: ID!
+}
+
+input UpdateCommentInput {
+  text: String
+}
+
+enum MutationType {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+type PostSubscriptionPayload {
+  mutation: MutationType!
+  data: Post!
+}
+
+type CommentSubscriptionPayload {
+  mutation: MutationType!
+  data: Comment!
+}
