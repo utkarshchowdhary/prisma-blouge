@@ -7,7 +7,7 @@ const getCurrentUserId = async (request, authAssign = true) => {
 
   if (header) {
     const token = header.replace('Bearer ', '');
-    const decoded = jwt.verify(token, 'my-ultra-secure-and-ultra-long-secret');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     return decoded.userId;
   }
