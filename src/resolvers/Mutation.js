@@ -237,9 +237,7 @@ const Mutation = {
     comment = await prisma.comment.findFirst({
       where: {
         id: args.id,
-        author: {
-          id: userId,
-        },
+        OR: [{ author: { id: userId } }, { post: { author: { id: userId } } }],
       },
     });
 
