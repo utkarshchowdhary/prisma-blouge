@@ -24,8 +24,6 @@ const Query = {
       orderBy: args.orderBy,
     };
 
-    console.log('Before fetching users');
-
     const users = await prisma.user.findMany({
       ...opArgs,
       include: {
@@ -34,11 +32,7 @@ const Query = {
       },
     });
 
-    console.log('After fetching users before fetching count', users);
-
     const count = await prisma.user.count({ where });
-
-    console.log('After fetching count', count);
 
     return {
       count,
