@@ -30,11 +30,13 @@ const server = new GraphQLServer({
   },
 });
 
-server.start(
-  { port: process.env.PORT || 4000, cors: { origin } },
-  ({ port }) => {
-    console.log(
-      `Graphql Server up, listening on port ${port} for incoming requests.`
-    );
-  }
-);
+const options = {
+  port: process.env.PORT || 4000,
+  cors: { origin: '*' },
+};
+
+server.start(options, ({ port }) => {
+  console.log(
+    `Graphql Server up, listening on port ${port} for incoming requests.`
+  );
+});
