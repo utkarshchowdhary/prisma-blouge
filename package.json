@@ -28,6 +28,7 @@
     "jsonwebtoken": "^8.5.1"
   },
   "engines": {
-    "node": "^12"
+    "node": "^12",
+    "npm": "^6"
   }
 }
