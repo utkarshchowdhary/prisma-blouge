@@ -5,18 +5,25 @@ const getCurrentUserId = async (request, authAssign = true) => {
     ? request.request.headers.authorization
     : request.connection.context.Authorization;
 
-  if (header) {
-    const token = header.replace('Bearer ', '');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  try {
+    if (header) {
+      const token = header.replace('Bearer ', '');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    return decoded.userId;
+      return decoded.userId;
+    }
+
+    if (authAssign) {
+      throw new Error('Authentication required');
+    }
+
+    return null;
+  } catch (error) {
+    if (!authAssign) {
+      return null;
+    }
+    throw error;
   }
-
-  if (authAssign) {
-    throw new Error('Authentication required');
-  }
-
-  return null;
 };
 
 export { getCurrentUserId as default };
