@@ -14,8 +14,6 @@ const Mutation = {
 
     const token = generateToken(user.id);
 
-    request.request.headers.authorization = `Bearer ${token}`;
-
     return {
       user,
       token,
@@ -34,8 +32,6 @@ const Mutation = {
     }
 
     const token = generateToken(user.id);
-
-    request.request.headers.authorization = `Bearer ${token}`;
 
     return {
       user,
