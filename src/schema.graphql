@@ -82,17 +82,17 @@ type Comment {
 
 type UserGob {
   count: Int!
-  users: [User!]!
+  results: [User!]!
 }
 
 type PostGob {
   count: Int!
-  posts: [Post!]!
+  results: [Post!]!
 }
 
 type CommentGob {
   count: Int!
-  comments: [Comment!]!
+  results: [Comment!]!
 }
 
 input UserLimitByInput {

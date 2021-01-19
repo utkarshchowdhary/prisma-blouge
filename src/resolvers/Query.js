@@ -24,7 +24,7 @@ const Query = {
       orderBy: args.orderBy,
     };
 
-    const users = await prisma.user.findMany({
+    const results = await prisma.user.findMany({
       ...opArgs,
       include: {
         posts: true,
@@ -36,7 +36,7 @@ const Query = {
 
     return {
       count,
-      users,
+      results,
     };
   },
   async posts(parent, args, { prisma }) {
@@ -70,7 +70,7 @@ const Query = {
       orderBy: args.orderBy,
     };
 
-    const posts = await prisma.post.findMany({
+    const results = await prisma.post.findMany({
       ...opArgs,
       include: {
         author: true,
@@ -82,7 +82,7 @@ const Query = {
 
     return {
       count,
-      posts,
+      results,
     };
   },
   async ownPosts(parent, args, { prisma, request }) {
@@ -139,7 +139,7 @@ const Query = {
       orderBy: args.orderBy,
     };
 
-    const posts = await prisma.post.findMany({
+    const results = await prisma.post.findMany({
       ...opArgs,
       include: {
         author: true,
@@ -151,7 +151,7 @@ const Query = {
 
     return {
       count,
-      posts,
+      results,
     };
   },
   async comments(parent, args, { prisma }) {
@@ -181,7 +181,7 @@ const Query = {
       orderBy: args.orderBy,
     };
 
-    const comments = await prisma.comment.findMany({
+    const results = await prisma.comment.findMany({
       ...opArgs,
       include: {
         author: true,
@@ -193,7 +193,7 @@ const Query = {
 
     return {
       count,
-      comments,
+      results,
     };
   },
   async post(parent, args, { prisma, request }) {
