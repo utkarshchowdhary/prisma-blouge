@@ -53,7 +53,7 @@ type Subscription {
 type User {
   id: ID!
   name: String!
-  email: String
+  email: String!
   createdAt: String!
   updatedAt: String!
   posts: [Post!]!
