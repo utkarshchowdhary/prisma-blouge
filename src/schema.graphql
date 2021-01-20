@@ -1,29 +1,29 @@
 type Query {
   users(
     filter: String
-    page: Int = 1
-    take: Int = 50
+    page: Int
+    take: Int
     limit: UserLimitByInput
     orderBy: UserOrderByInput
   ): UserGob!
   posts(
     filter: String
-    page: Int = 1
-    take: Int = 50
+    page: Int
+    take: Int
     limit: PostLimitByInput
     orderBy: PostOrderByInput
   ): PostGob!
   ownPosts(
     filter: String
-    page: Int = 1
-    take: Int = 50
+    page: Int
+    take: Int
     limit: OwnPostLimitByInput
     orderBy: PostOrderByInput
   ): PostGob!
   comments(
     filter: String
-    page: Int = 1
-    take: Int = 50
+    page: Int
+    take: Int
     limit: CommentLimitByInput
     orderBy: CommentOrderByInput
   ): CommentGob!

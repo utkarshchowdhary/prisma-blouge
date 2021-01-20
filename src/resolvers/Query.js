@@ -4,7 +4,7 @@ const Query = {
   async users(parent, args, { prisma }) {
     const page = args.page;
     const take = args.take;
-    const skip = (page - 1) * take;
+    const skip = page && take && (page - 1) * take;
 
     const limit = {};
 
@@ -47,7 +47,7 @@ const Query = {
   async posts(parent, args, { prisma }) {
     const page = args.page;
     const take = args.take;
-    const skip = (page - 1) * take;
+    const skip = page && take && (page - 1) * take;
 
     const limit = {};
 
@@ -94,7 +94,7 @@ const Query = {
     const userId = await getCurrentUserId(request);
     const page = args.page;
     const take = args.take;
-    const skip = (page - 1) * take;
+    const skip = page && take && (page - 1) * take;
 
     const user = await prisma.user.findOne({
       where: {
@@ -162,7 +162,7 @@ const Query = {
   async comments(parent, args, { prisma }) {
     const page = args.page;
     const take = args.take;
-    const skip = (page - 1) * take;
+    const skip = page && take && (page - 1) * take;
 
     const limit = {};
 
