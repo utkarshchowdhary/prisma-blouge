@@ -144,9 +144,7 @@ const Query = {
       for (const prop in args.limit) {
         limit[prop] = {
           equals: args.limit[prop],
-          ...(typeof args.limit[prop] !== 'boolean'
-            ? { mode: 'insensitive' }
-            : {}),
+          ...(typeof args.limit[prop] !== 'boolean' && { mode: 'insensitive' }),
         };
       }
     }
