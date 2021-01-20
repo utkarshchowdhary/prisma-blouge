@@ -1,7 +1,7 @@
 type Query {
   users(
     filter: String
-    cursor: ID
+    page: Int = 1
     take: Int = 50
     limit: UserLimitByInput
     orderBy: UserOrderByInput

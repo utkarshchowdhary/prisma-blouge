@@ -2,6 +2,10 @@ import getCurrentUserId from '../utils/getCurrentUserId';
 
 const Query = {
   async users(parent, args, { prisma }) {
+    const page = args.page;
+    const take = args.take;
+    const skip = (page - 1) * take;
+
     const limit = {};
 
     if (args.limit) {
@@ -19,8 +23,9 @@ const Query = {
 
     const opArgs = {
       where,
-      take: args.take,
-      ...(args.cursor ? { skip: 1, cursor: { id: args.cursor } } : {}),
+      skip,
+      take,
+      // ...(args.cursor ? { skip: 1, cursor: { id: args.cursor } } : {}),
       orderBy: args.orderBy,
     };
 
