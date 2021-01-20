@@ -80,18 +80,31 @@ type Comment {
   post: Post!
 }
 
+type Pagination {
+  next: PaginationParam
+  prev: PaginationParam
+}
+
+type PaginationParam {
+  page: Int!
+  take: Int!
+}
+
 type UserGob {
   count: Int!
+  pagination: Pagination
   results: [User!]!
 }
 
 type PostGob {
   count: Int!
+  pagination: Pagination
   results: [Post!]!
 }
 
 type CommentGob {
   count: Int!
+  pagination: Pagination
   results: [Comment!]!
 }
 

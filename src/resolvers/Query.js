@@ -2,10 +2,6 @@ import getCurrentUserId from '../utils/getCurrentUserId';
 
 const Query = {
   async users(parent, args, { prisma }) {
-    const page = args.page;
-    const take = args.take;
-    const skip = page && take && (page - 1) * take;
-
     const limit = {};
 
     if (args.limit) {
@@ -21,11 +17,33 @@ const Query = {
         }
       : { ...limit };
 
+    const count = await prisma.user.count({ where });
+
+    let startIndex, endIndex;
+    const pagination = {};
+    if (args.page && args.take) {
+      startIndex = (args.page - 1) * args.take;
+      endIndex = args.page * args.take;
+
+      if (endIndex < count) {
+        pagination.next = {
+          page: args.page + 1,
+          take: args.take,
+        };
+      }
+
+      if (startIndex > 0) {
+        pagination.prev = {
+          page: args.page - 1,
+          take: args.take,
+        };
+      }
+    }
+
     const opArgs = {
       where,
-      skip,
-      take,
-      // ...(args.cursor ? { skip: 1, cursor: { id: args.cursor } } : {}),
+      skip: startIndex,
+      take: args.take,
       orderBy: args.orderBy,
     };
 
@@ -37,18 +55,13 @@ const Query = {
       },
     });
 
-    const count = await prisma.user.count({ where });
-
     return {
       count,
+      ...(Object.keys(pagination).length !== 0 && { pagination }),
       results,
     };
   },
   async posts(parent, args, { prisma }) {
-    const page = args.page;
-    const take = args.take;
-    const skip = page && take && (page - 1) * take;
-
     const limit = {};
 
     if (args.limit) {
@@ -68,10 +81,33 @@ const Query = {
         }
       : { published: true, ...limit };
 
+    const count = await prisma.post.count({ where });
+
+    let startIndex, endIndex;
+    const pagination = {};
+    if (args.page && args.take) {
+      startIndex = (args.page - 1) * args.take;
+      endIndex = args.page * args.take;
+
+      if (endIndex < count) {
+        pagination.next = {
+          page: args.page + 1,
+          take: args.take,
+        };
+      }
+
+      if (startIndex > 0) {
+        pagination.prev = {
+          page: args.page - 1,
+          take: args.take,
+        };
+      }
+    }
+
     const opArgs = {
       where,
-      skip,
-      take,
+      skip: startIndex,
+      take: args.take,
       orderBy: args.orderBy,
     };
 
@@ -83,18 +119,14 @@ const Query = {
       },
     });
 
-    const count = await prisma.post.count({ where });
-
     return {
       count,
+      ...(Object.keys(pagination).length !== 0 && { pagination }),
       results,
     };
   },
   async ownPosts(parent, args, { prisma, request }) {
     const userId = await getCurrentUserId(request);
-    const page = args.page;
-    const take = args.take;
-    const skip = page && take && (page - 1) * take;
 
     const user = await prisma.user.findOne({
       where: {
@@ -137,10 +169,33 @@ const Query = {
           ...limit,
         };
 
+    const count = await prisma.post.count({ where });
+
+    let startIndex, endIndex;
+    const pagination = {};
+    if (args.page && args.take) {
+      startIndex = (args.page - 1) * args.take;
+      endIndex = args.page * args.take;
+
+      if (endIndex < count) {
+        pagination.next = {
+          page: args.page + 1,
+          take: args.take,
+        };
+      }
+
+      if (startIndex > 0) {
+        pagination.prev = {
+          page: args.page - 1,
+          take: args.take,
+        };
+      }
+    }
+
     const opArgs = {
       where,
-      skip,
-      take,
+      skip: startIndex,
+      take: args.take,
       orderBy: args.orderBy,
     };
 
@@ -152,18 +207,13 @@ const Query = {
       },
     });
 
-    const count = await prisma.post.count({ where });
-
     return {
       count,
+      ...(Object.keys(pagination).length !== 0 && { pagination }),
       results,
     };
   },
   async comments(parent, args, { prisma }) {
-    const page = args.page;
-    const take = args.take;
-    const skip = page && take && (page - 1) * take;
-
     const limit = {};
 
     if (args.limit) {
@@ -179,10 +229,33 @@ const Query = {
         }
       : { ...limit };
 
+    const count = await prisma.comment.count({ where });
+
+    let startIndex, endIndex;
+    const pagination = {};
+    if (args.page && args.take) {
+      startIndex = (args.page - 1) * args.take;
+      endIndex = args.page * args.take;
+
+      if (endIndex < count) {
+        pagination.next = {
+          page: args.page + 1,
+          take: args.take,
+        };
+      }
+
+      if (startIndex > 0) {
+        pagination.prev = {
+          page: args.page - 1,
+          take: args.take,
+        };
+      }
+    }
+
     const opArgs = {
       where,
-      skip,
-      take,
+      skip: startIndex,
+      take: args.take,
       orderBy: args.orderBy,
     };
 
@@ -194,10 +267,9 @@ const Query = {
       },
     });
 
-    const count = await prisma.comment.count({ where });
-
     return {
       count,
+      ...(Object.keys(pagination).length !== 0 && { pagination }),
       results,
     };
   },
