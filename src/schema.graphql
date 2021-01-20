@@ -110,6 +110,7 @@ type CommentGob {
 
 input UserLimitByInput {
   name: String
+  email: String
 }
 
 input PostLimitByInput {
