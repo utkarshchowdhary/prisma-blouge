@@ -128,7 +128,7 @@ const Query = {
   async ownPosts(parent, args, { prisma, request }) {
     const userId = await getCurrentUserId(request);
 
-    const user = await prisma.user.findOne({
+    const user = await prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -302,7 +302,7 @@ const Query = {
   async me(parent, args, { prisma, request }) {
     const userId = await getCurrentUserId(request);
 
-    const user = await prisma.user.findOne({
+    const user = await prisma.user.findUnique({
       where: {
         id: userId,
       },

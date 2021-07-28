@@ -20,7 +20,7 @@ const Mutation = {
     };
   },
   async login(parent, args, { prisma, request }) {
-    const user = await prisma.user.findOne({
+    const user = await prisma.user.findUnique({
       where: {
         email: args.data.email,
       },
@@ -41,7 +41,7 @@ const Mutation = {
   async deleteUser(parent, args, { prisma, request }) {
     const userId = await getCurrentUserId(request);
 
-    const user = await prisma.user.findOne({
+    const user = await prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -59,7 +59,7 @@ const Mutation = {
   async updateUser(parent, args, { prisma, request }) {
     const userId = await getCurrentUserId(request);
 
-    const user = await prisma.user.findOne({
+    const user = await prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -82,7 +82,7 @@ const Mutation = {
   async createPost(parent, args, { prisma, pubsub, request }) {
     const userId = await getCurrentUserId(request);
 
-    const user = await prisma.user.findOne({
+    const user = await prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -187,7 +187,7 @@ const Mutation = {
     const userId = await getCurrentUserId(request);
     const postId = args.data.post;
 
-    const user = await prisma.user.findOne({
+    const user = await prisma.user.findUnique({
       where: {
         id: userId,
       },

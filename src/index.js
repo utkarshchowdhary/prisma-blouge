@@ -21,17 +21,13 @@ const server = new GraphQLServer({
     Subscription,
     User,
   },
-  context(request) {
-    return {
-      prisma,
-      pubsub,
-      request,
-    };
-  },
+  context: (request) => ({
+    prisma,
+    pubsub,
+    request,
+  }),
 });
 
-server.start({ port: process.env.PORT || 4000 }, ({ port }) => {
-  console.log(
-    `Graphql Server up, listening on port ${port} for incoming requests.`
-  );
+server.start({ port: process.env.PORT }, () => {
+  console.log('server running');
 });

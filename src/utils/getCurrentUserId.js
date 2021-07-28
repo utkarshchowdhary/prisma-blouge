@@ -13,16 +13,13 @@ const getCurrentUserId = async (request, authAssign = true) => {
       return decoded.userId;
     }
 
-    if (authAssign) {
-      throw new Error('Authentication required');
-    }
+    if (authAssign) throw new Error('Authentication required');
 
     return null;
   } catch (error) {
-    if (!authAssign) {
-      return null;
-    }
-    throw error;
+    if (authAssign) throw error;
+
+    return null;
   }
 };
 

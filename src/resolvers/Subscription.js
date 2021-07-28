@@ -8,7 +8,7 @@ const Subscription = {
   },
   comment: {
     async subscribe(parent, { postId }, { prisma, pubsub }) {
-      const post = await prisma.post.findOne({
+      const post = await prisma.post.findUnique({
         where: {
           id: postId,
         },
@@ -25,7 +25,7 @@ const Subscription = {
     async subscribe(parent, args, { prisma, pubsub, request }) {
       const userId = await getCurrentUserId(request);
 
-      const user = await prisma.user.findOne({
+      const user = await prisma.user.findUnique({
         where: {
           id: userId,
         },

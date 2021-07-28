@@ -5,28 +5,28 @@ type Query {
     take: Int
     limit: UserLimitByInput
     orderBy: UserOrderByInput
-  ): UserGob!
+  ): Users!
   posts(
     filter: String
     page: Int
     take: Int
     limit: PostLimitByInput
     orderBy: PostOrderByInput
-  ): PostGob!
+  ): Posts!
   ownPosts(
     filter: String
     page: Int
     take: Int
     limit: OwnPostLimitByInput
     orderBy: PostOrderByInput
-  ): PostGob!
+  ): Posts!
   comments(
     filter: String
     page: Int
     take: Int
     limit: CommentLimitByInput
     orderBy: CommentOrderByInput
-  ): CommentGob!
+  ): Comments!
   post(id: ID!): Post!
   me: User!
 }
@@ -90,19 +90,19 @@ type PaginationParam {
   take: Int!
 }
 
-type UserGob {
+type Users {
   count: Int!
   pagination: Pagination
   results: [User!]!
 }
 
-type PostGob {
+type Posts {
   count: Int!
   pagination: Pagination
   results: [Post!]!
 }
 
-type CommentGob {
+type Comments {
   count: Int!
   pagination: Pagination
   results: [Comment!]!
@@ -130,7 +130,7 @@ input CommentLimitByInput {
 
 input UserOrderByInput {
   name: Sort
-  email: String
+  email: Sort
   createdAt: Sort
   updatedAt: Sort
 }
