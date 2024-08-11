@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // uses connection pooling
+  directUrl = env("DATABASE_URL_NON_POOLING") // uses a direct connection
 }
 
 model Comment {
@@ -12,10 +13,10 @@ model Comment {
   text      String
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
-  authorId  String?  @db.VarChar(25)
-  postId    String?  @db.VarChar(25)
-  author    User?    @relation(fields: [authorId], references: [id])
-  post      Post?    @relation(fields: [postId], references: [id])
+  authorId  String   @db.VarChar(25)
+  postId    String   @db.VarChar(25)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_comment_post")
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_comment_user")
 }
 
 model Post {
@@ -25,9 +26,9 @@ model Post {
   published Boolean   @default(false)
   createdAt DateTime  @default(now()) @db.Timestamp(6)
   updatedAt DateTime  @updatedAt @db.Timestamp(6)
-  authorId  String?   @db.VarChar(25)
-  author    User?     @relation(fields: [authorId], references: [id])
+  authorId  String    @db.VarChar(25)
   comments  Comment[]
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_post_user")
 }
 
 model User {
