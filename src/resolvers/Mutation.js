@@ -30,8 +30,7 @@ const Mutation = {
     async login(_parent, args, { prisma }) {
         const { email, password } = args.data;
         const user = await prisma.user.findUnique({
-            where: { email },
-            include: { posts: true, comments: true }
+            where: { email }
         });
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -52,8 +51,7 @@ const Mutation = {
         if (!user) throw new GraphQLError('User not found.');
 
         return prisma.user.delete({
-            where: { id: userId },
-            include: { posts: true, comments: true }
+            where: { id: userId }
         });
     },
     async updateUser(_parent, args, { request, prisma }) {
@@ -71,8 +69,7 @@ const Mutation = {
             data: {
                 ...args.data,
                 ...(password && { password: await hashPassword(password) })
-            },
-            include: { posts: true, comments: true }
+            }
         });
     },
     async createPost(_parent, args, { request, prisma, pubSub }) {
@@ -93,8 +90,7 @@ const Mutation = {
                 body,
                 author: { connect: { id: userId } },
                 ...(published && { published })
-            },
-            include: { author: true, comments: true }
+            }
         });
 
         if (published) {
@@ -120,8 +116,7 @@ const Mutation = {
         if (!post) throw new GraphQLError('Unable to delete Post.');
 
         post = await prisma.post.delete({
-            where: { id: args.id },
-            include: { author: true, comments: true }
+            where: { id: args.id }
         });
 
         if (post.published) {
@@ -155,8 +150,7 @@ const Mutation = {
 
         post = await prisma.post.update({
             where: { id: args.id },
-            data: args.data,
-            include: { author: true, comments: true }
+            data: args.data
         });
 
         if (published) {
@@ -195,8 +189,7 @@ const Mutation = {
                 text,
                 post: { connect: { id: postId } },
                 author: { connect: { id: userId } }
-            },
-            include: { author: true, post: true }
+            }
         });
 
         pubSub.publish(`comment ${postId}`, {
@@ -221,11 +214,10 @@ const Mutation = {
         if (!comment) throw new GraphQLError('Unable to delete comment.');
 
         comment = await prisma.comment.delete({
-            where: { id: args.id },
-            include: { author: true, post: true }
+            where: { id: args.id }
         });
 
-        pubSub.publish(`comment ${comment.post.id}`, {
+        pubSub.publish(`comment ${comment.postId}`, {
             comment: {
                 mutation: 'DELETED',
                 data: comment
@@ -236,6 +228,7 @@ const Mutation = {
     },
     async updateComment(_parent, args, { request, prisma, pubSub }) {
         const userId = getCurrentUserId(request);
+
         let comment = await prisma.comment.findFirst({
             where: {
                 id: args.id,
@@ -247,11 +240,10 @@ const Mutation = {
 
         comment = await prisma.comment.update({
             where: { id: args.id },
-            data: args.data,
-            include: { author: true, post: true }
+            data: args.data
         });
 
-        pubSub.publish(`comment ${comment.post.id}`, {
+        pubSub.publish(`comment ${comment.postId}`, {
             comment: {
                 mutation: 'UPDATED',
                 data: comment

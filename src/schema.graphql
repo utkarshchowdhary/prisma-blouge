@@ -35,13 +35,13 @@ type Mutation {
     createUser(data: CreateUserInput!): AuthPayload!
     login(data: LoginUserInput!): AuthPayload!
     deleteUser: User!
-    updateUser(data: UpdateUserInput): User!
+    updateUser(data: UpdateUserInput!): User!
     createPost(data: CreatePostInput!): Post!
     deletePost(id: ID!): Post!
-    updatePost(id: ID!, data: UpdatePostInput): Post!
+    updatePost(id: ID!, data: UpdatePostInput!): Post!
     createComment(data: CreateCommentInput): Comment!
     deleteComment(id: ID!): Comment!
-    updateComment(id: ID!, data: UpdateCommentInput): Comment!
+    updateComment(id: ID!, data: UpdateCommentInput!): Comment!
 }
 
 type Subscription {
