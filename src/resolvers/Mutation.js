@@ -77,7 +77,7 @@ const Mutation = {
       include: { posts: true, comments: true },
     });
   },
-  async createPost(_parent, args, { request, prisma, pubsub }) {
+  async createPost(_parent, args, { request, prisma, pubSub }) {
     const userId = await getCurrentUserId(request);
 
     const user = await prisma.user.findUnique({
@@ -99,16 +99,16 @@ const Mutation = {
     });
 
     if (post.published) {
-      pubsub.publish('post', { post: { mutation: 'CREATED', data: post } });
+      pubSub.publish('post', { post: { mutation: 'CREATED', data: post } });
     }
 
-    pubsub.publish(`post ${userId}`, {
+    pubSub.publish(`post ${userId}`, {
       myPost: { mutation: 'CREATED', data: post },
     });
 
     return post;
   },
-  async deletePost(_parent, args, { request, prisma, pubsub }) {
+  async deletePost(_parent, args, { request, prisma, pubSub }) {
     const userId = await getCurrentUserId(request);
     let post;
 
@@ -129,16 +129,16 @@ const Mutation = {
     });
 
     if (post.published) {
-      pubsub.publish('post', { post: { mutation: 'DELETED', data: post } });
+      pubSub.publish('post', { post: { mutation: 'DELETED', data: post } });
     }
 
-    pubsub.publish(`post ${userId}`, {
+    pubSub.publish(`post ${userId}`, {
       myPost: { mutation: 'DELETED', data: post },
     });
 
     return post;
   },
-  async updatePost(_parent, args, { request, prisma, pubsub }) {
+  async updatePost(_parent, args, { request, prisma, pubSub }) {
     const userId = await getCurrentUserId(request);
     let post;
 
@@ -166,16 +166,16 @@ const Mutation = {
     });
 
     if (post.published) {
-      pubsub.publish('post', { post: { mutation: 'UPDATED', data: post } });
+      pubSub.publish('post', { post: { mutation: 'UPDATED', data: post } });
     }
 
-    pubsub.publish(`post ${userId}`, {
+    pubSub.publish(`post ${userId}`, {
       myPost: { mutation: 'UPDATED', data: post },
     });
 
     return post;
   },
-  async createComment(_parent, args, { request, prisma, pubsub }) {
+  async createComment(_parent, args, { request, prisma, pubSub }) {
     const userId = await getCurrentUserId(request);
     const postId = args.data.post;
 
@@ -205,7 +205,7 @@ const Mutation = {
       include: { author: true, post: true },
     });
 
-    pubsub.publish(`comment ${postId}`, {
+    pubSub.publish(`comment ${postId}`, {
       comment: {
         mutation: 'CREATED',
         data: comment,
@@ -214,7 +214,7 @@ const Mutation = {
 
     return comment;
   },
-  async deleteComment(_parent, args, { request, prisma, pubsub }) {
+  async deleteComment(_parent, args, { request, prisma, pubSub }) {
     const userId = await getCurrentUserId(request);
     let comment;
 
@@ -232,7 +232,7 @@ const Mutation = {
       include: { author: true, post: true },
     });
 
-    pubsub.publish(`comment ${comment.post.id}`, {
+    pubSub.publish(`comment ${comment.post.id}`, {
       comment: {
         mutation: 'DELETED',
         data: comment,
@@ -241,7 +241,7 @@ const Mutation = {
 
     return comment;
   },
-  async updateComment(_parent, args, { request, prisma, pubsub }) {
+  async updateComment(_parent, args, { request, prisma, pubSub }) {
     const userId = await getCurrentUserId(request);
     let comment = await prisma.comment.findFirst({
       where: {
@@ -260,7 +260,7 @@ const Mutation = {
       include: { author: true, post: true },
     });
 
-    pubsub.publish(`comment ${comment.post.id}`, {
+    pubSub.publish(`comment ${comment.post.id}`, {
       comment: {
         mutation: 'UPDATED',
         data: comment,

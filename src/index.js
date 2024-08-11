@@ -12,7 +12,7 @@ import User from './resolvers/User';
 
 const prisma = new PrismaClient();
 
-const pubsub = createPubSub();
+const pubSub = createPubSub();
 
 const typeDefs = fs.readFileSync(
   path.join(__dirname, 'schema.graphql'),
@@ -31,7 +31,7 @@ const schema = createSchema({
 
 const createContext = () => ({
   prisma,
-  pubsub,
+  pubSub,
 });
 
 const yoga = createYoga({

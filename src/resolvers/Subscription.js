@@ -3,12 +3,12 @@ import getCurrentUserId from '../utils/getCurrentUserId';
 
 const Subscription = {
   post: {
-    subscribe(_parent, _args, { pubsub }) {
-      return pubsub.asyncIterator('post');
+    subscribe(_parent, _args, { pubSub }) {
+      return pubSub.asyncIterator('post');
     },
   },
   comment: {
-    async subscribe(_parent, { postId }, { prisma, pubsub }) {
+    async subscribe(_parent, { postId }, { prisma, pubSub }) {
       const post = await prisma.post.findUnique({
         where: {
           id: postId,
@@ -17,11 +17,11 @@ const Subscription = {
 
       if (!post) throw new GraphQLError('Post not found');
 
-      return pubsub.asyncIterator(`comment ${postId}`);
+      return pubSub.asyncIterator(`comment ${postId}`);
     },
   },
   myPost: {
-    async subscribe(_parent, _args, { request, prisma, pubsub }) {
+    async subscribe(_parent, _args, { request, prisma, pubSub }) {
       const userId = await getCurrentUserId(request);
 
       const user = await prisma.user.findUnique({
@@ -32,7 +32,7 @@ const Subscription = {
 
       if (!user) throw new GraphQLError('User not found');
 
-      return pubsub.asyncIterator(`post ${userId}`);
+      return pubSub.asyncIterator(`post ${userId}`);
     },
   },
 };
