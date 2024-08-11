@@ -1,7 +1,8 @@
+import { GraphQLError } from 'graphql';
 import getCurrentUserId from '../utils/getCurrentUserId';
 
 const Query = {
-  async users(parent, args, { prisma }) {
+  async users(_parent, args, { prisma }) {
     const limit = {};
 
     if (args.limit) {
@@ -61,7 +62,7 @@ const Query = {
       results,
     };
   },
-  async posts(parent, args, { prisma }) {
+  async posts(_parent, args, { prisma }) {
     const limit = {};
 
     if (args.limit) {
@@ -125,7 +126,7 @@ const Query = {
       results,
     };
   },
-  async myPosts(parent, args, { prisma, request }) {
+  async myPosts(_parent, args, { request, prisma }) {
     const userId = await getCurrentUserId(request);
 
     const user = await prisma.user.findUnique({
@@ -134,9 +135,7 @@ const Query = {
       },
     });
 
-    if (!user) {
-      throw new Error('User not found');
-    }
+    if (!user) throw new GraphQLError('User not found');
 
     const limit = {};
 
@@ -144,7 +143,7 @@ const Query = {
       for (const prop in args.limit) {
         limit[prop] = {
           equals: args.limit[prop],
-          ...(typeof args.limit[prop] !== 'boolean' && { mode: 'insensitive' }),
+          ...(typeof args.limit[prop] === 'string' && { mode: 'insensitive' }),
         };
       }
     }
@@ -211,7 +210,7 @@ const Query = {
       results,
     };
   },
-  async comments(parent, args, { prisma }) {
+  async comments(_parent, args, { prisma }) {
     const limit = {};
 
     if (args.limit) {
@@ -271,7 +270,7 @@ const Query = {
       results,
     };
   },
-  async post(parent, args, { prisma, request }) {
+  async post(_parent, args, { request, prisma }) {
     const userId = await getCurrentUserId(request, false);
 
     const opArgs = {
@@ -293,13 +292,11 @@ const Query = {
       },
     });
 
-    if (!post) {
-      throw new Error('Unable to fetch post');
-    }
+    if (!post) throw new GraphQLError('Unable to fetch post');
 
     return post;
   },
-  async me(parent, args, { prisma, request }) {
+  async me(_parent, _args, { request, prisma }) {
     const userId = await getCurrentUserId(request);
 
     const user = await prisma.user.findUnique({
@@ -309,9 +306,7 @@ const Query = {
       include: { posts: true, comments: true },
     });
 
-    if (!user) {
-      throw new Error('User not found');
-    }
+    if (!user) throw new GraphQLError('User not found');
 
     return user;
   },

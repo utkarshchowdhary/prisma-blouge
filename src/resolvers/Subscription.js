@@ -1,28 +1,27 @@
+import { GraphQLError } from 'graphql';
 import getCurrentUserId from '../utils/getCurrentUserId';
 
 const Subscription = {
   post: {
-    subscribe(parent, args, { pubsub }) {
+    subscribe(_parent, _args, { pubsub }) {
       return pubsub.asyncIterator('post');
     },
   },
   comment: {
-    async subscribe(parent, { postId }, { prisma, pubsub }) {
+    async subscribe(_parent, { postId }, { prisma, pubsub }) {
       const post = await prisma.post.findUnique({
         where: {
           id: postId,
         },
       });
 
-      if (!post) {
-        throw new Error('Post not found');
-      }
+      if (!post) throw new GraphQLError('Post not found');
 
       return pubsub.asyncIterator(`comment ${postId}`);
     },
   },
   myPost: {
-    async subscribe(parent, args, { prisma, pubsub, request }) {
+    async subscribe(_parent, _args, { request, prisma, pubsub }) {
       const userId = await getCurrentUserId(request);
 
       const user = await prisma.user.findUnique({
@@ -31,9 +30,7 @@ const Subscription = {
         },
       });
 
-      if (!user) {
-        throw new Error('User not found');
-      }
+      if (!user) throw new GraphQLError('User not found');
 
       return pubsub.asyncIterator(`post ${userId}`);
     },

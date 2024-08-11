@@ -1,10 +1,11 @@
+import { GraphQLError } from 'graphql';
 import bcrypt from 'bcryptjs';
 import getCurrentUserId from '../utils/getCurrentUserId';
 import generateToken from '../utils/generateToken';
 import hashPassword from '../utils/hashPassword';
 
 const Mutation = {
-  async createUser(parent, args, { prisma, request }) {
+  async createUser(_parent, args, { prisma }) {
     const password = await hashPassword(args.data.password);
 
     const user = await prisma.user.create({
@@ -19,7 +20,7 @@ const Mutation = {
       token,
     };
   },
-  async login(parent, args, { prisma, request }) {
+  async login(_parent, args, { prisma }) {
     const user = await prisma.user.findUnique({
       where: {
         email: args.data.email,
@@ -28,7 +29,7 @@ const Mutation = {
     });
 
     if (!user || !(await bcrypt.compare(args.data.password, user.password))) {
-      throw new Error('Unable to login');
+      throw new GraphQLError('Unable to login');
     }
 
     const token = generateToken(user.id);
@@ -38,7 +39,7 @@ const Mutation = {
       token,
     };
   },
-  async deleteUser(parent, args, { prisma, request }) {
+  async deleteUser(_parent, _args, { request, prisma }) {
     const userId = await getCurrentUserId(request);
 
     const user = await prisma.user.findUnique({
@@ -47,16 +48,14 @@ const Mutation = {
       },
     });
 
-    if (!user) {
-      throw new Error('User not found');
-    }
+    if (!user) throw new GraphQLError('User not found');
 
     return prisma.user.delete({
       where: { id: userId },
       include: { posts: true, comments: true },
     });
   },
-  async updateUser(parent, args, { prisma, request }) {
+  async updateUser(_parent, args, { request, prisma }) {
     const userId = await getCurrentUserId(request);
 
     const user = await prisma.user.findUnique({
@@ -65,21 +64,20 @@ const Mutation = {
       },
     });
 
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    if (typeof args.data.password === 'string') {
-      args.data.password = await hashPassword(args.data.password);
-    }
+    if (!user) throw new GraphQLError('User not found');
 
     return prisma.user.update({
       where: { id: userId },
-      data: args.data,
+      data: {
+        ...args.data,
+        ...(args.data.password && {
+          password: await hashPassword(args.data.password),
+        }),
+      },
       include: { posts: true, comments: true },
     });
   },
-  async createPost(parent, args, { prisma, pubsub, request }) {
+  async createPost(_parent, args, { request, prisma, pubsub }) {
     const userId = await getCurrentUserId(request);
 
     const user = await prisma.user.findUnique({
@@ -88,9 +86,7 @@ const Mutation = {
       },
     });
 
-    if (!user) {
-      throw new Error('User not found');
-    }
+    if (!user) throw new GraphQLError('User not found');
 
     const post = await prisma.post.create({
       data: {
@@ -112,7 +108,7 @@ const Mutation = {
 
     return post;
   },
-  async deletePost(parent, args, { prisma, pubsub, request }) {
+  async deletePost(_parent, args, { request, prisma, pubsub }) {
     const userId = await getCurrentUserId(request);
     let post;
 
@@ -125,9 +121,7 @@ const Mutation = {
       },
     });
 
-    if (!post) {
-      throw new Error('Unable to delete Post');
-    }
+    if (!post) throw new GraphQLError('Unable to delete Post');
 
     post = await prisma.post.delete({
       where: { id: args.id },
@@ -144,7 +138,7 @@ const Mutation = {
 
     return post;
   },
-  async updatePost(parent, args, { prisma, pubsub, request }) {
+  async updatePost(_parent, args, { request, prisma, pubsub }) {
     const userId = await getCurrentUserId(request);
     let post;
 
@@ -157,9 +151,7 @@ const Mutation = {
       },
     });
 
-    if (!post) {
-      throw new Error('Unable to update Post');
-    }
+    if (!post) throw new GraphQLError('Unable to update Post');
 
     if (post.published && !args.data.published) {
       await prisma.comment.deleteMany({
@@ -183,7 +175,7 @@ const Mutation = {
 
     return post;
   },
-  async createComment(parent, args, { prisma, pubsub, request }) {
+  async createComment(_parent, args, { request, prisma, pubsub }) {
     const userId = await getCurrentUserId(request);
     const postId = args.data.post;
 
@@ -193,9 +185,7 @@ const Mutation = {
       },
     });
 
-    if (!user) {
-      throw new Error('User not found');
-    }
+    if (!user) throw new GraphQLError('User not found');
 
     const post = await prisma.post.findFirst({
       where: {
@@ -204,9 +194,7 @@ const Mutation = {
       },
     });
 
-    if (!post) {
-      throw new Error('Post not found');
-    }
+    if (!post) throw new GraphQLError('Post not found');
 
     const comment = await prisma.comment.create({
       data: {
@@ -226,7 +214,7 @@ const Mutation = {
 
     return comment;
   },
-  async deleteComment(parent, args, { prisma, pubsub, request }) {
+  async deleteComment(_parent, args, { request, prisma, pubsub }) {
     const userId = await getCurrentUserId(request);
     let comment;
 
@@ -237,9 +225,7 @@ const Mutation = {
       },
     });
 
-    if (!comment) {
-      throw new Error('Unable to delete comment');
-    }
+    if (!comment) throw new GraphQLError('Unable to delete comment');
 
     comment = await prisma.comment.delete({
       where: { id: args.id },
@@ -255,11 +241,9 @@ const Mutation = {
 
     return comment;
   },
-  async updateComment(parent, args, { prisma, pubsub, request }) {
+  async updateComment(_parent, args, { request, prisma, pubsub }) {
     const userId = await getCurrentUserId(request);
-    let comment;
-
-    comment = await prisma.comment.findFirst({
+    let comment = await prisma.comment.findFirst({
       where: {
         id: args.id,
         author: {
@@ -268,9 +252,7 @@ const Mutation = {
       },
     });
 
-    if (!comment) {
-      throw new Error('Unable to update comment');
-    }
+    if (!comment) throw new GraphQLError('Unable to update comment');
 
     comment = await prisma.comment.update({
       where: { id: args.id },

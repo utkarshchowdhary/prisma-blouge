@@ -1,5 +1,5 @@
 const User = {
-  posts(parent, args, { prisma }) {
+  posts(parent, _args, { prisma }) {
     return prisma.post.findMany({
       where: {
         published: true,
