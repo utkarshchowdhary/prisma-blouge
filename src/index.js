@@ -14,29 +14,26 @@ const prisma = new PrismaClient();
 
 const pubSub = createPubSub();
 
-const typeDefs = fs.readFileSync(
-  path.join(__dirname, 'schema.graphql'),
-  'utf8'
-);
+const typeDefs = fs.readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8');
 
 const schema = createSchema({
-  typeDefs,
-  resolvers: {
-    Query,
-    Mutation,
-    Subscription,
-    User,
-  },
+    typeDefs,
+    resolvers: {
+        Query,
+        Mutation,
+        Subscription,
+        User
+    }
 });
 
 const createContext = () => ({
-  prisma,
-  pubSub,
+    prisma,
+    pubSub
 });
 
 const yoga = createYoga({
-  schema,
-  context: createContext,
+    schema,
+    context: createContext
 });
 
 const server = createServer(yoga);
@@ -44,5 +41,5 @@ const server = createServer(yoga);
 const port = process.env.PORT;
 
 server.listen({ port }, () => {
-  console.log(`Server is running on http://localhost:${port}/graphql`);
+    console.log(`Server is running on http://localhost:${port}/graphql`);
 });

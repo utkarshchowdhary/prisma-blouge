@@ -2,314 +2,315 @@ import { GraphQLError } from 'graphql';
 import getCurrentUserId from '../utils/getCurrentUserId';
 
 const Query = {
-  async users(_parent, args, { prisma }) {
-    const limit = {};
+    async users(_parent, args, { prisma }) {
+        const limit = {};
 
-    if (args.limit) {
-      for (const prop in args.limit) {
-        limit[prop] = { equals: args.limit[prop], mode: 'insensitive' };
-      }
-    }
-
-    const where = args.filter
-      ? {
-          name: { contains: args.filter, mode: 'insensitive' },
-          ...limit,
+        if (args.limit) {
+            for (const prop in args.limit) {
+                limit[prop] = { equals: args.limit[prop], mode: 'insensitive' };
+            }
         }
-      : { ...limit };
 
-    const count = await prisma.user.count({ where });
+        const where = args.filter
+            ? {
+                  name: { contains: args.filter, mode: 'insensitive' },
+                  ...limit
+              }
+            : limit;
 
-    let startIndex, endIndex;
-    const pagination = {};
-    if (args.page && args.take) {
-      startIndex = (args.page - 1) * args.take;
-      endIndex = args.page * args.take;
+        const count = await prisma.user.count({ where });
 
-      if (endIndex < count) {
-        pagination.next = {
-          page: args.page + 1,
-          take: args.take,
-        };
-      }
+        let startIndex, endIndex;
+        const pagination = {};
 
-      if (startIndex > 0) {
-        pagination.prev = {
-          page: args.page - 1,
-          take: args.take,
-        };
-      }
-    }
+        if (args.page && args.take) {
+            startIndex = (args.page - 1) * args.take;
+            endIndex = args.page * args.take;
 
-    const opArgs = {
-      where,
-      skip: startIndex,
-      take: args.take,
-      orderBy: args.orderBy,
-    };
+            if (endIndex < count) {
+                pagination.next = {
+                    page: args.page + 1,
+                    take: args.take
+                };
+            }
 
-    const results = await prisma.user.findMany({
-      ...opArgs,
-      include: {
-        posts: true,
-        comments: true,
-      },
-    });
-
-    return {
-      count,
-      ...(Object.keys(pagination).length !== 0 && { pagination }),
-      results,
-    };
-  },
-  async posts(_parent, args, { prisma }) {
-    const limit = {};
-
-    if (args.limit) {
-      for (const prop in args.limit) {
-        limit[prop] = { equals: args.limit[prop], mode: 'insensitive' };
-      }
-    }
-
-    const where = args.filter
-      ? {
-          published: true,
-          OR: [
-            { title: { contains: args.filter, mode: 'insensitive' } },
-            { body: { contains: args.filter, mode: 'insensitive' } },
-          ],
-          ...limit,
+            if (startIndex > 0) {
+                pagination.prev = {
+                    page: args.page - 1,
+                    take: args.take
+                };
+            }
         }
-      : { published: true, ...limit };
 
-    const count = await prisma.post.count({ where });
-
-    let startIndex, endIndex;
-    const pagination = {};
-    if (args.page && args.take) {
-      startIndex = (args.page - 1) * args.take;
-      endIndex = args.page * args.take;
-
-      if (endIndex < count) {
-        pagination.next = {
-          page: args.page + 1,
-          take: args.take,
+        const opArgs = {
+            where,
+            skip: startIndex,
+            take: args.take,
+            orderBy: args.orderBy
         };
-      }
 
-      if (startIndex > 0) {
-        pagination.prev = {
-          page: args.page - 1,
-          take: args.take,
+        const results = await prisma.user.findMany({
+            ...opArgs,
+            include: {
+                posts: true,
+                comments: true
+            }
+        });
+
+        return {
+            count,
+            ...(['next', 'prev'].some(key => pagination[key]) && { pagination }),
+            results
         };
-      }
-    }
+    },
+    async posts(_parent, args, { prisma }) {
+        const limit = {};
 
-    const opArgs = {
-      where,
-      skip: startIndex,
-      take: args.take,
-      orderBy: args.orderBy,
-    };
-
-    const results = await prisma.post.findMany({
-      ...opArgs,
-      include: {
-        author: true,
-        comments: true,
-      },
-    });
-
-    return {
-      count,
-      ...(Object.keys(pagination).length !== 0 && { pagination }),
-      results,
-    };
-  },
-  async myPosts(_parent, args, { request, prisma }) {
-    const userId = await getCurrentUserId(request);
-
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
-
-    if (!user) throw new GraphQLError('User not found');
-
-    const limit = {};
-
-    if (args.limit) {
-      for (const prop in args.limit) {
-        limit[prop] = {
-          equals: args.limit[prop],
-          ...(typeof args.limit[prop] === 'string' && { mode: 'insensitive' }),
-        };
-      }
-    }
-
-    const where = args.filter
-      ? {
-          author: {
-            id: userId,
-          },
-          OR: [
-            { title: { contains: args.filter, mode: 'insensitive' } },
-            { body: { contains: args.filter, mode: 'insensitive' } },
-          ],
-          ...limit,
+        if (args.limit) {
+            for (const prop in args.limit) {
+                limit[prop] = { equals: args.limit[prop], mode: 'insensitive' };
+            }
         }
-      : {
-          author: {
-            id: userId,
-          },
-          ...limit,
-        };
 
-    const count = await prisma.post.count({ where });
+        const where = args.filter
+            ? {
+                  published: true,
+                  OR: [
+                      { title: { contains: args.filter, mode: 'insensitive' } },
+                      { body: { contains: args.filter, mode: 'insensitive' } }
+                  ],
+                  ...limit
+              }
+            : { published: true, ...limit };
 
-    let startIndex, endIndex;
-    const pagination = {};
-    if (args.page && args.take) {
-      startIndex = (args.page - 1) * args.take;
-      endIndex = args.page * args.take;
+        const count = await prisma.post.count({ where });
 
-      if (endIndex < count) {
-        pagination.next = {
-          page: args.page + 1,
-          take: args.take,
-        };
-      }
+        let startIndex, endIndex;
+        const pagination = {};
+        if (args.page && args.take) {
+            startIndex = (args.page - 1) * args.take;
+            endIndex = args.page * args.take;
 
-      if (startIndex > 0) {
-        pagination.prev = {
-          page: args.page - 1,
-          take: args.take,
-        };
-      }
-    }
+            if (endIndex < count) {
+                pagination.next = {
+                    page: args.page + 1,
+                    take: args.take
+                };
+            }
 
-    const opArgs = {
-      where,
-      skip: startIndex,
-      take: args.take,
-      orderBy: args.orderBy,
-    };
-
-    const results = await prisma.post.findMany({
-      ...opArgs,
-      include: {
-        author: true,
-        comments: true,
-      },
-    });
-
-    return {
-      count,
-      ...(Object.keys(pagination).length !== 0 && { pagination }),
-      results,
-    };
-  },
-  async comments(_parent, args, { prisma }) {
-    const limit = {};
-
-    if (args.limit) {
-      for (const prop in args.limit) {
-        limit[prop] = { equals: args.limit[prop], mode: 'insensitive' };
-      }
-    }
-
-    const where = args.filter
-      ? {
-          text: { contains: args.filter, mode: 'insensitive' },
-          ...limit,
+            if (startIndex > 0) {
+                pagination.prev = {
+                    page: args.page - 1,
+                    take: args.take
+                };
+            }
         }
-      : { ...limit };
 
-    const count = await prisma.comment.count({ where });
-
-    let startIndex, endIndex;
-    const pagination = {};
-    if (args.page && args.take) {
-      startIndex = (args.page - 1) * args.take;
-      endIndex = args.page * args.take;
-
-      if (endIndex < count) {
-        pagination.next = {
-          page: args.page + 1,
-          take: args.take,
+        const opArgs = {
+            where,
+            skip: startIndex,
+            take: args.take,
+            orderBy: args.orderBy
         };
-      }
 
-      if (startIndex > 0) {
-        pagination.prev = {
-          page: args.page - 1,
-          take: args.take,
+        const results = await prisma.post.findMany({
+            ...opArgs,
+            include: {
+                author: true,
+                comments: true
+            }
+        });
+
+        return {
+            count,
+            ...(Object.keys(pagination).length !== 0 && { pagination }),
+            results
         };
-      }
+    },
+    async myPosts(_parent, args, { request, prisma }) {
+        const userId = await getCurrentUserId(request);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        });
+
+        if (!user) throw new GraphQLError('User not found');
+
+        const limit = {};
+
+        if (args.limit) {
+            for (const prop in args.limit) {
+                limit[prop] = {
+                    equals: args.limit[prop],
+                    ...(typeof args.limit[prop] === 'string' && { mode: 'insensitive' })
+                };
+            }
+        }
+
+        const where = args.filter
+            ? {
+                  author: {
+                      id: userId
+                  },
+                  OR: [
+                      { title: { contains: args.filter, mode: 'insensitive' } },
+                      { body: { contains: args.filter, mode: 'insensitive' } }
+                  ],
+                  ...limit
+              }
+            : {
+                  author: {
+                      id: userId
+                  },
+                  ...limit
+              };
+
+        const count = await prisma.post.count({ where });
+
+        let startIndex, endIndex;
+        const pagination = {};
+        if (args.page && args.take) {
+            startIndex = (args.page - 1) * args.take;
+            endIndex = args.page * args.take;
+
+            if (endIndex < count) {
+                pagination.next = {
+                    page: args.page + 1,
+                    take: args.take
+                };
+            }
+
+            if (startIndex > 0) {
+                pagination.prev = {
+                    page: args.page - 1,
+                    take: args.take
+                };
+            }
+        }
+
+        const opArgs = {
+            where,
+            skip: startIndex,
+            take: args.take,
+            orderBy: args.orderBy
+        };
+
+        const results = await prisma.post.findMany({
+            ...opArgs,
+            include: {
+                author: true,
+                comments: true
+            }
+        });
+
+        return {
+            count,
+            ...(Object.keys(pagination).length !== 0 && { pagination }),
+            results
+        };
+    },
+    async comments(_parent, args, { prisma }) {
+        const limit = {};
+
+        if (args.limit) {
+            for (const prop in args.limit) {
+                limit[prop] = { equals: args.limit[prop], mode: 'insensitive' };
+            }
+        }
+
+        const where = args.filter
+            ? {
+                  text: { contains: args.filter, mode: 'insensitive' },
+                  ...limit
+              }
+            : { ...limit };
+
+        const count = await prisma.comment.count({ where });
+
+        let startIndex, endIndex;
+        const pagination = {};
+        if (args.page && args.take) {
+            startIndex = (args.page - 1) * args.take;
+            endIndex = args.page * args.take;
+
+            if (endIndex < count) {
+                pagination.next = {
+                    page: args.page + 1,
+                    take: args.take
+                };
+            }
+
+            if (startIndex > 0) {
+                pagination.prev = {
+                    page: args.page - 1,
+                    take: args.take
+                };
+            }
+        }
+
+        const opArgs = {
+            where,
+            skip: startIndex,
+            take: args.take,
+            orderBy: args.orderBy
+        };
+
+        const results = await prisma.comment.findMany({
+            ...opArgs,
+            include: {
+                author: true,
+                post: true
+            }
+        });
+
+        return {
+            count,
+            ...(Object.keys(pagination).length !== 0 && { pagination }),
+            results
+        };
+    },
+    async post(_parent, args, { request, prisma }) {
+        const userId = await getCurrentUserId(request, false);
+
+        const opArgs = {
+            where: {
+                id: args.id,
+                OR: [{ published: true }]
+            }
+        };
+
+        if (userId) {
+            opArgs.where.OR.push({ author: { id: userId } });
+        }
+
+        const post = await prisma.post.findFirst({
+            ...opArgs,
+            include: {
+                author: true,
+                comments: true
+            }
+        });
+
+        if (!post) throw new GraphQLError('Unable to fetch post');
+
+        return post;
+    },
+    async me(_parent, _args, { request, prisma }) {
+        const userId = await getCurrentUserId(request);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
+            include: { posts: true, comments: true }
+        });
+
+        if (!user) throw new GraphQLError('User not found');
+
+        return user;
     }
-
-    const opArgs = {
-      where,
-      skip: startIndex,
-      take: args.take,
-      orderBy: args.orderBy,
-    };
-
-    const results = await prisma.comment.findMany({
-      ...opArgs,
-      include: {
-        author: true,
-        post: true,
-      },
-    });
-
-    return {
-      count,
-      ...(Object.keys(pagination).length !== 0 && { pagination }),
-      results,
-    };
-  },
-  async post(_parent, args, { request, prisma }) {
-    const userId = await getCurrentUserId(request, false);
-
-    const opArgs = {
-      where: {
-        id: args.id,
-        OR: [{ published: true }],
-      },
-    };
-
-    if (userId) {
-      opArgs.where.OR.push({ author: { id: userId } });
-    }
-
-    const post = await prisma.post.findFirst({
-      ...opArgs,
-      include: {
-        author: true,
-        comments: true,
-      },
-    });
-
-    if (!post) throw new GraphQLError('Unable to fetch post');
-
-    return post;
-  },
-  async me(_parent, _args, { request, prisma }) {
-    const userId = await getCurrentUserId(request);
-
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      include: { posts: true, comments: true },
-    });
-
-    if (!user) throw new GraphQLError('User not found');
-
-    return user;
-  },
 };
 
 export { Query as default };

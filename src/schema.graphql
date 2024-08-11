@@ -1,214 +1,214 @@
 type Query {
-  users(
-    filter: String
-    page: Int
-    take: Int
-    limit: UserLimitByInput
-    orderBy: UserOrderByInput
-  ): Users!
-  posts(
-    filter: String
-    page: Int
-    take: Int
-    limit: PostLimitByInput
-    orderBy: PostOrderByInput
-  ): Posts!
-  myPosts(
-    filter: String
-    page: Int
-    take: Int
-    limit: MyPostLimitByInput
-    orderBy: PostOrderByInput
-  ): Posts!
-  comments(
-    filter: String
-    page: Int
-    take: Int
-    limit: CommentLimitByInput
-    orderBy: CommentOrderByInput
-  ): Comments!
-  post(id: ID!): Post!
-  me: User!
+    users(
+        filter: String
+        page: Int
+        take: Int
+        limit: UserLimitByInput
+        orderBy: UserOrderByInput
+    ): Users!
+    posts(
+        filter: String
+        page: Int
+        take: Int
+        limit: PostLimitByInput
+        orderBy: PostOrderByInput
+    ): Posts!
+    myPosts(
+        filter: String
+        page: Int
+        take: Int
+        limit: MyPostLimitByInput
+        orderBy: PostOrderByInput
+    ): Posts!
+    comments(
+        filter: String
+        page: Int
+        take: Int
+        limit: CommentLimitByInput
+        orderBy: CommentOrderByInput
+    ): Comments!
+    post(id: ID!): Post!
+    me: User!
 }
 
 type Mutation {
-  createUser(data: CreateUserInput!): AuthPayload!
-  login(data: LoginUserInput!): AuthPayload!
-  deleteUser: User!
-  updateUser(data: UpdateUserInput): User!
-  createPost(data: CreatePostInput!): Post!
-  deletePost(id: ID!): Post!
-  updatePost(id: ID!, data: UpdatePostInput): Post!
-  createComment(data: CreateCommentInput): Comment!
-  deleteComment(id: ID!): Comment!
-  updateComment(id: ID!, data: UpdateCommentInput): Comment!
+    createUser(data: CreateUserInput!): AuthPayload!
+    login(data: LoginUserInput!): AuthPayload!
+    deleteUser: User!
+    updateUser(data: UpdateUserInput): User!
+    createPost(data: CreatePostInput!): Post!
+    deletePost(id: ID!): Post!
+    updatePost(id: ID!, data: UpdatePostInput): Post!
+    createComment(data: CreateCommentInput): Comment!
+    deleteComment(id: ID!): Comment!
+    updateComment(id: ID!, data: UpdateCommentInput): Comment!
 }
 
 type Subscription {
-  comment(postId: ID!): CommentSubscriptionPayload!
-  post: PostSubscriptionPayload!
-  myPost: PostSubscriptionPayload!
+    comment(postId: ID!): CommentSubscriptionPayload!
+    post: PostSubscriptionPayload!
+    myPost: PostSubscriptionPayload!
 }
 
 type User {
-  id: ID!
-  name: String!
-  email: String!
-  createdAt: String!
-  updatedAt: String!
-  posts: [Post!]!
-  comments: [Comment!]!
+    id: ID!
+    name: String!
+    email: String!
+    createdAt: String!
+    updatedAt: String!
+    posts: [Post!]!
+    comments: [Comment!]!
 }
 
 type Post {
-  id: ID!
-  title: String!
-  body: String!
-  published: Boolean!
-  createdAt: String!
-  updatedAt: String!
-  author: User!
-  comments: [Comment!]!
+    id: ID!
+    title: String!
+    body: String!
+    published: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    author: User!
+    comments: [Comment!]!
 }
 
 type Comment {
-  id: ID!
-  text: String!
-  createdAt: String!
-  updatedAt: String!
-  author: User!
-  post: Post!
+    id: ID!
+    text: String!
+    createdAt: String!
+    updatedAt: String!
+    author: User!
+    post: Post!
 }
 
 type Pagination {
-  next: PaginationParam
-  prev: PaginationParam
+    next: PaginationParam
+    prev: PaginationParam
 }
 
 type PaginationParam {
-  page: Int!
-  take: Int!
+    page: Int!
+    take: Int!
 }
 
 type Users {
-  count: Int!
-  pagination: Pagination
-  results: [User!]!
+    count: Int!
+    pagination: Pagination
+    results: [User!]!
 }
 
 type Posts {
-  count: Int!
-  pagination: Pagination
-  results: [Post!]!
+    count: Int!
+    pagination: Pagination
+    results: [Post!]!
 }
 
 type Comments {
-  count: Int!
-  pagination: Pagination
-  results: [Comment!]!
+    count: Int!
+    pagination: Pagination
+    results: [Comment!]!
 }
 
 input UserLimitByInput {
-  name: String
-  email: String
+    name: String
+    email: String
 }
 
 input PostLimitByInput {
-  title: String
-  body: String
+    title: String
+    body: String
 }
 
 input MyPostLimitByInput {
-  title: String
-  body: String
-  published: Boolean
+    title: String
+    body: String
+    published: Boolean
 }
 
 input CommentLimitByInput {
-  text: String
+    text: String
 }
 
 input UserOrderByInput {
-  name: Sort
-  email: Sort
-  createdAt: Sort
-  updatedAt: Sort
+    name: Sort
+    email: Sort
+    createdAt: Sort
+    updatedAt: Sort
 }
 
 input PostOrderByInput {
-  title: Sort
-  body: Sort
-  published: Sort
-  createdAt: Sort
-  updatedAt: Sort
+    title: Sort
+    body: Sort
+    published: Sort
+    createdAt: Sort
+    updatedAt: Sort
 }
 
 input CommentOrderByInput {
-  text: Sort
-  createdAt: Sort
-  updatedAt: Sort
+    text: Sort
+    createdAt: Sort
+    updatedAt: Sort
 }
 
 enum Sort {
-  asc
-  desc
+    asc
+    desc
 }
 
 type AuthPayload {
-  token: String!
-  user: User!
+    token: String!
+    user: User!
 }
 
 input CreateUserInput {
-  name: String!
-  email: String!
-  password: String!
+    name: String!
+    email: String!
+    password: String!
 }
 
 input LoginUserInput {
-  email: String!
-  password: String!
+    email: String!
+    password: String!
 }
 
 input UpdateUserInput {
-  name: String
-  email: String
-  password: String
+    name: String
+    email: String
+    password: String
 }
 
 input CreatePostInput {
-  title: String!
-  body: String!
-  published: Boolean
+    title: String!
+    body: String!
+    published: Boolean
 }
 
 input UpdatePostInput {
-  title: String
-  body: String
-  published: Boolean
+    title: String
+    body: String
+    published: Boolean
 }
 
 input CreateCommentInput {
-  text: String!
-  post: ID!
+    text: String!
+    post: ID!
 }
 
 input UpdateCommentInput {
-  text: String
+    text: String
 }
 
 enum MutationType {
-  CREATED
-  UPDATED
-  DELETED
+    CREATED
+    UPDATED
+    DELETED
 }
 
 type PostSubscriptionPayload {
-  mutation: MutationType!
-  data: Post!
+    mutation: MutationType!
+    data: Post!
 }
 
 type CommentSubscriptionPayload {
-  mutation: MutationType!
-  data: Comment!
+    mutation: MutationType!
+    data: Comment!
 }
