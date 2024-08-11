@@ -11,9 +11,9 @@ const getCurrentUserId = (request, authAssign = true) => {
             return userId;
         }
 
-        if (authAssign) throw new GraphQLError('Authentication required');
+        if (authAssign) throw new GraphQLError('Authentication required.');
     } catch (error) {
-        if (authAssign) throw new GraphQLError('Authentication failed');
+        if (authAssign) throw new GraphQLError('Authentication failed.');
     }
 };
 

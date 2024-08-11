@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import getCurrentUserId from '../utils/getCurrentUserId';
 import generateToken from '../utils/generateToken';
@@ -9,10 +10,18 @@ const Mutation = {
         const { password } = args.data;
         const hash = await hashPassword(password);
 
-        const user = await prisma.user.create({
-            data: { ...args.data, password: hash },
-            include: { posts: true, comments: true }
-        });
+        const user = await prisma.user
+            .create({
+                data: { ...args.data, password: hash }
+            })
+            .catch(err => {
+                if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+                    return Promise.reject(
+                        new GraphQLError('A user with this email already exists.')
+                    );
+                }
+                return Promise.reject(err);
+            });
 
         const token = generateToken(user.id);
 
@@ -26,7 +35,7 @@ const Mutation = {
         });
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
-            throw new GraphQLError('Unable to login');
+            throw new GraphQLError('Unable to login.');
         }
 
         const token = generateToken(user.id);
@@ -40,7 +49,7 @@ const Mutation = {
             where: { id: userId }
         });
 
-        if (!user) throw new GraphQLError('User not found');
+        if (!user) throw new GraphQLError('User not found.');
 
         return prisma.user.delete({
             where: { id: userId },
@@ -55,7 +64,7 @@ const Mutation = {
             where: { id: userId }
         });
 
-        if (!user) throw new GraphQLError('User not found');
+        if (!user) throw new GraphQLError('User not found.');
 
         return prisma.user.update({
             where: { id: userId },
@@ -76,7 +85,7 @@ const Mutation = {
             }
         });
 
-        if (!user) throw new GraphQLError('User not found');
+        if (!user) throw new GraphQLError('User not found.');
 
         const post = await prisma.post.create({
             data: {
@@ -108,7 +117,7 @@ const Mutation = {
             }
         });
 
-        if (!post) throw new GraphQLError('Unable to delete Post');
+        if (!post) throw new GraphQLError('Unable to delete Post.');
 
         post = await prisma.post.delete({
             where: { id: args.id },
@@ -136,7 +145,7 @@ const Mutation = {
             }
         });
 
-        if (!post) throw new GraphQLError('Unable to update Post');
+        if (!post) throw new GraphQLError('Unable to update Post.');
 
         if (post.published && !published) {
             await prisma.comment.deleteMany({
@@ -170,7 +179,7 @@ const Mutation = {
             }
         });
 
-        if (!user) throw new GraphQLError('User not found');
+        if (!user) throw new GraphQLError('User not found.');
 
         const post = await prisma.post.findFirst({
             where: {
@@ -179,7 +188,7 @@ const Mutation = {
             }
         });
 
-        if (!post) throw new GraphQLError('Post not found');
+        if (!post) throw new GraphQLError('Post not found.');
 
         const comment = await prisma.comment.create({
             data: {
@@ -209,7 +218,7 @@ const Mutation = {
             }
         });
 
-        if (!comment) throw new GraphQLError('Unable to delete comment');
+        if (!comment) throw new GraphQLError('Unable to delete comment.');
 
         comment = await prisma.comment.delete({
             where: { id: args.id },
@@ -234,7 +243,7 @@ const Mutation = {
             }
         });
 
-        if (!comment) throw new GraphQLError('Unable to update comment');
+        if (!comment) throw new GraphQLError('Unable to update comment.');
 
         comment = await prisma.comment.update({
             where: { id: args.id },

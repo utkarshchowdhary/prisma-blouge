@@ -15,7 +15,7 @@ const Subscription = {
                 }
             });
 
-            if (!post) throw new GraphQLError('Post not found');
+            if (!post) throw new GraphQLError('Post not found.');
 
             return pubSub.asyncIterator(`comment ${postId}`);
         }
@@ -30,7 +30,7 @@ const Subscription = {
                 }
             });
 
-            if (!user) throw new GraphQLError('User not found');
+            if (!user) throw new GraphQLError('User not found.');
 
             return pubSub.asyncIterator(`post ${userId}`);
         }

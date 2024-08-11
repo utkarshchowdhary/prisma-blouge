@@ -122,7 +122,7 @@ const Query = {
             where: { id: userId }
         });
 
-        if (!user) throw new GraphQLError('User not found');
+        if (!user) throw new GraphQLError('User not found.');
 
         const criteria = createEqualsFilter(args.criteria);
 
@@ -245,7 +245,7 @@ const Query = {
             }
         });
 
-        if (!post) throw new GraphQLError('Unable to fetch post');
+        if (!post) throw new GraphQLError('Unable to fetch post.');
 
         return post;
     },
@@ -257,7 +257,7 @@ const Query = {
             include: { posts: true, comments: true }
         });
 
-        if (!user) throw new GraphQLError('User not found');
+        if (!user) throw new GraphQLError('User not found.');
 
         return user;
     }
