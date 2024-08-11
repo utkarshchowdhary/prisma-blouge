@@ -13,11 +13,11 @@ type Query {
     limit: PostLimitByInput
     orderBy: PostOrderByInput
   ): Posts!
-  ownPosts(
+  myPosts(
     filter: String
     page: Int
     take: Int
-    limit: OwnPostLimitByInput
+    limit: MyPostLimitByInput
     orderBy: PostOrderByInput
   ): Posts!
   comments(
@@ -47,7 +47,7 @@ type Mutation {
 type Subscription {
   comment(postId: ID!): CommentSubscriptionPayload!
   post: PostSubscriptionPayload!
-  ownPost: PostSubscriptionPayload!
+  myPost: PostSubscriptionPayload!
 }
 
 type User {
@@ -118,7 +118,7 @@ input PostLimitByInput {
   body: String
 }
 
-input OwnPostLimitByInput {
+input MyPostLimitByInput {
   title: String
   body: String
   published: Boolean

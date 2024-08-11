@@ -125,7 +125,7 @@ const Query = {
       results,
     };
   },
-  async ownPosts(parent, args, { prisma, request }) {
+  async myPosts(parent, args, { prisma, request }) {
     const userId = await getCurrentUserId(request);
 
     const user = await prisma.user.findUnique({

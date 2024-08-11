@@ -21,7 +21,7 @@ const Subscription = {
       return pubsub.asyncIterator(`comment ${postId}`);
     },
   },
-  ownPost: {
+  myPost: {
     async subscribe(parent, args, { prisma, pubsub, request }) {
       const userId = await getCurrentUserId(request);
 

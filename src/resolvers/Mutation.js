@@ -107,7 +107,7 @@ const Mutation = {
     }
 
     pubsub.publish(`post ${userId}`, {
-      ownPost: { mutation: 'CREATED', data: post },
+      myPost: { mutation: 'CREATED', data: post },
     });
 
     return post;
@@ -139,7 +139,7 @@ const Mutation = {
     }
 
     pubsub.publish(`post ${userId}`, {
-      ownPost: { mutation: 'DELETED', data: post },
+      myPost: { mutation: 'DELETED', data: post },
     });
 
     return post;
@@ -178,7 +178,7 @@ const Mutation = {
     }
 
     pubsub.publish(`post ${userId}`, {
-      ownPost: { mutation: 'UPDATED', data: post },
+      myPost: { mutation: 'UPDATED', data: post },
     });
 
     return post;
