@@ -116,7 +116,7 @@ const Query = {
         };
     },
     async myPosts(_parent, args, { request, prisma }) {
-        const userId = await getCurrentUserId(request);
+        const userId = getCurrentUserId(request);
 
         const user = await prisma.user.findUnique({
             where: { id: userId }
@@ -231,7 +231,7 @@ const Query = {
         };
     },
     async post(_parent, args, { request, prisma }) {
-        const userId = await getCurrentUserId(request, false);
+        const userId = getCurrentUserId(request, false);
 
         const opArgs = {
             where: getPostAccessFilter(args.id, userId)
@@ -250,7 +250,7 @@ const Query = {
         return post;
     },
     async me(_parent, _args, { request, prisma }) {
-        const userId = await getCurrentUserId(request);
+        const userId = getCurrentUserId(request);
 
         const user = await prisma.user.findUnique({
             where: { id: userId },

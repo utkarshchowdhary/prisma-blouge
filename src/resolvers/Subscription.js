@@ -22,7 +22,7 @@ const Subscription = {
     },
     myPost: {
         async subscribe(_parent, _args, { request, prisma, pubSub }) {
-            const userId = await getCurrentUserId(request);
+            const userId = getCurrentUserId(request);
 
             const user = await prisma.user.findUnique({
                 where: {

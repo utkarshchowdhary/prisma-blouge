@@ -1,7 +1,7 @@
 import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
 
-const getCurrentUserId = async (request, authAssign = true) => {
+const getCurrentUserId = (request, authAssign = true) => {
     const header = request.headers.get('authorization');
 
     try {
