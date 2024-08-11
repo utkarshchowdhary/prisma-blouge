@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { containsFilter, createEqualsFilter, createContainsFilter } from '../utils';
+import { containsFilter, createEqualsFilter, createContainsFilter } from '../utils/filter';
 import getCurrentUserId from '../utils/getCurrentUserId';
 
 const Query = {
