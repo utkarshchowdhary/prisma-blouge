@@ -34,3 +34,11 @@ export function createContainsFilter(criteria, searchTerm, fields) {
         OR: fields.map(field => containsFilter(field, searchTerm))
     };
 }
+
+export function getPostAccessFilter(postId, userId) {
+    if (!userId) return { id: postId, published: true };
+    return {
+        id: postId,
+        OR: [{ published: true }, { author: { id: userId } }]
+    };
+}

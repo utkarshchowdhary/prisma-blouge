@@ -1,5 +1,10 @@
 import { GraphQLError } from 'graphql';
-import { containsFilter, createEqualsFilter, createContainsFilter } from '../utils/filter';
+import {
+    containsFilter,
+    createEqualsFilter,
+    createContainsFilter,
+    getPostAccessFilter
+} from '../utils/filter';
 import getCurrentUserId from '../utils/getCurrentUserId';
 
 const Query = {
@@ -114,9 +119,7 @@ const Query = {
         const userId = await getCurrentUserId(request);
 
         const user = await prisma.user.findUnique({
-            where: {
-                id: userId
-            }
+            where: { id: userId }
         });
 
         if (!user) throw new GraphQLError('User not found');
@@ -231,10 +234,7 @@ const Query = {
         const userId = await getCurrentUserId(request, false);
 
         const opArgs = {
-            where: {
-                id: args.id,
-                OR: [{ published: true }, ...(userId ? [{ author: { id: userId } }] : [])]
-            }
+            where: getPostAccessFilter(args.id, userId)
         };
 
         const post = await prisma.post.findFirst({
@@ -253,9 +253,7 @@ const Query = {
         const userId = await getCurrentUserId(request);
 
         const user = await prisma.user.findUnique({
-            where: {
-                id: userId
-            },
+            where: { id: userId },
             include: { posts: true, comments: true }
         });
 
