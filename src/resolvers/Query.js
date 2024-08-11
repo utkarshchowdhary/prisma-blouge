@@ -1,22 +1,15 @@
 import { GraphQLError } from 'graphql';
+import { containsFilter, createEqualsFilter, createContainsFilter } from '../utils';
 import getCurrentUserId from '../utils/getCurrentUserId';
 
 const Query = {
     async users(_parent, args, { prisma }) {
-        const limit = {};
+        const criteria = createEqualsFilter(args.criteria);
 
-        if (args.limit) {
-            for (const prop in args.limit) {
-                limit[prop] = { equals: args.limit[prop], mode: 'insensitive' };
-            }
-        }
-
-        const where = args.filter
-            ? {
-                  name: { contains: args.filter, mode: 'insensitive' },
-                  ...limit
-              }
-            : limit;
+        const where = {
+            ...(args.searchTerm && containsFilter('name', args.searchTerm)),
+            ...criteria
+        };
 
         const count = await prisma.user.count({ where });
 
@@ -59,34 +52,24 @@ const Query = {
 
         return {
             count,
-            ...(['next', 'prev'].some(key => pagination[key]) && { pagination }),
+            ...(Object.keys(pagination).length && { pagination }),
             results
         };
     },
     async posts(_parent, args, { prisma }) {
-        const limit = {};
+        const criteria = createEqualsFilter(args.criteria);
 
-        if (args.limit) {
-            for (const prop in args.limit) {
-                limit[prop] = { equals: args.limit[prop], mode: 'insensitive' };
-            }
-        }
-
-        const where = args.filter
-            ? {
-                  published: true,
-                  OR: [
-                      { title: { contains: args.filter, mode: 'insensitive' } },
-                      { body: { contains: args.filter, mode: 'insensitive' } }
-                  ],
-                  ...limit
-              }
-            : { published: true, ...limit };
+        const where = {
+            published: true,
+            ...createContainsFilter(criteria, args.searchTerm, ['title', 'body']),
+            ...criteria
+        };
 
         const count = await prisma.post.count({ where });
 
         let startIndex, endIndex;
         const pagination = {};
+
         if (args.page && args.take) {
             startIndex = (args.page - 1) * args.take;
             endIndex = args.page * args.take;
@@ -123,7 +106,7 @@ const Query = {
 
         return {
             count,
-            ...(Object.keys(pagination).length !== 0 && { pagination }),
+            ...(Object.keys(pagination).length && { pagination }),
             results
         };
     },
@@ -138,39 +121,19 @@ const Query = {
 
         if (!user) throw new GraphQLError('User not found');
 
-        const limit = {};
+        const criteria = createEqualsFilter(args.criteria);
 
-        if (args.limit) {
-            for (const prop in args.limit) {
-                limit[prop] = {
-                    equals: args.limit[prop],
-                    ...(typeof args.limit[prop] === 'string' && { mode: 'insensitive' })
-                };
-            }
-        }
-
-        const where = args.filter
-            ? {
-                  author: {
-                      id: userId
-                  },
-                  OR: [
-                      { title: { contains: args.filter, mode: 'insensitive' } },
-                      { body: { contains: args.filter, mode: 'insensitive' } }
-                  ],
-                  ...limit
-              }
-            : {
-                  author: {
-                      id: userId
-                  },
-                  ...limit
-              };
+        const where = {
+            author: { id: userId },
+            ...createContainsFilter(criteria, args.searchTerm, ['title', 'body']),
+            ...criteria
+        };
 
         const count = await prisma.post.count({ where });
 
         let startIndex, endIndex;
         const pagination = {};
+
         if (args.page && args.take) {
             startIndex = (args.page - 1) * args.take;
             endIndex = args.page * args.take;
@@ -207,30 +170,23 @@ const Query = {
 
         return {
             count,
-            ...(Object.keys(pagination).length !== 0 && { pagination }),
+            ...(Object.keys(pagination).length && { pagination }),
             results
         };
     },
     async comments(_parent, args, { prisma }) {
-        const limit = {};
+        const criteria = createEqualsFilter(args.criteria);
 
-        if (args.limit) {
-            for (const prop in args.limit) {
-                limit[prop] = { equals: args.limit[prop], mode: 'insensitive' };
-            }
-        }
-
-        const where = args.filter
-            ? {
-                  text: { contains: args.filter, mode: 'insensitive' },
-                  ...limit
-              }
-            : { ...limit };
+        const where = {
+            ...(args.searchTerm && containsFilter('text', args.searchTerm)),
+            ...criteria
+        };
 
         const count = await prisma.comment.count({ where });
 
         let startIndex, endIndex;
         const pagination = {};
+
         if (args.page && args.take) {
             startIndex = (args.page - 1) * args.take;
             endIndex = args.page * args.take;
@@ -267,7 +223,7 @@ const Query = {
 
         return {
             count,
-            ...(Object.keys(pagination).length !== 0 && { pagination }),
+            ...(Object.keys(pagination).length && { pagination }),
             results
         };
     },
@@ -277,13 +233,9 @@ const Query = {
         const opArgs = {
             where: {
                 id: args.id,
-                OR: [{ published: true }]
+                OR: [{ published: true }, ...(userId ? [{ author: { id: userId } }] : [])]
             }
         };
-
-        if (userId) {
-            opArgs.where.OR.push({ author: { id: userId } });
-        }
 
         const post = await prisma.post.findFirst({
             ...opArgs,
