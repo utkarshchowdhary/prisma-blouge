@@ -1,7 +1,10 @@
 import '@babel/polyfill';
 import 'dotenv/config';
+import fs from 'fs';
+import path from 'path';
+import { createServer } from 'node:http';
 import { PrismaClient } from '@prisma/client';
-import { GraphQLServer, PubSub } from 'graphql-yoga';
+import { createSchema, createPubSub, createYoga } from 'graphql-yoga';
 import Query from './resolvers/Query';
 import Mutation from './resolvers/Mutation';
 import Subscription from './resolvers/Subscription';
@@ -9,23 +12,37 @@ import User from './resolvers/User';
 
 const prisma = new PrismaClient();
 
-const pubsub = new PubSub();
+const pubsub = createPubSub();
 
-const server = new GraphQLServer({
-  typeDefs: './src/schema.graphql',
+const typeDefs = fs.readFileSync(
+  path.join(__dirname, 'schema.graphql'),
+  'utf8'
+);
+
+const schema = createSchema({
+  typeDefs,
   resolvers: {
     Query,
     Mutation,
     Subscription,
     User,
   },
-  context: (request) => ({
-    prisma,
-    pubsub,
-    request,
-  }),
 });
 
-server.start({ port: process.env.PORT }, () => {
-  console.log('server running');
+const createContext = () => ({
+  prisma,
+  pubsub,
+});
+
+const yoga = createYoga({
+  schema,
+  context: createContext,
+});
+
+const server = createServer(yoga);
+
+const port = process.env.PORT;
+
+server.listen({ port }, () => {
+  console.log(`Server is running on http://localhost:${port}/graphql`);
 });
