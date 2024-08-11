@@ -1,30 +1,30 @@
 type Query {
     users(
-        filter: String
         page: Int
         take: Int
-        limit: UserLimitByInput
+        criteria: UserCriteriaInput
+        searchTerm: String
         orderBy: UserOrderByInput
     ): Users!
     posts(
-        filter: String
         page: Int
         take: Int
-        limit: PostLimitByInput
+        criteria: PostCriteriaInput
+        searchTerm: String
         orderBy: PostOrderByInput
     ): Posts!
     myPosts(
-        filter: String
         page: Int
         take: Int
-        limit: MyPostLimitByInput
+        criteria: MyPostCriteriaInput
+        searchTerm: String
         orderBy: PostOrderByInput
     ): Posts!
     comments(
-        filter: String
         page: Int
         take: Int
-        limit: CommentLimitByInput
+        criteria: CommentCriteriaInput
+        searchTerm: String
         orderBy: CommentOrderByInput
     ): Comments!
     post(id: ID!): Post!
@@ -108,23 +108,23 @@ type Comments {
     results: [Comment!]!
 }
 
-input UserLimitByInput {
+input UserCriteriaInput {
     name: String
     email: String
 }
 
-input PostLimitByInput {
+input PostCriteriaInput {
     title: String
     body: String
 }
 
-input MyPostLimitByInput {
+input MyPostCriteriaInput {
     title: String
     body: String
     published: Boolean
 }
 
-input CommentLimitByInput {
+input CommentCriteriaInput {
     text: String
 }
 
