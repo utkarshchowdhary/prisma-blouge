@@ -42,3 +42,29 @@ export function getPostAccessFilter(postId, userId) {
         OR: [{ published: true }, { author: { id: userId } }]
     };
 }
+
+export function getPagination(count, page = 1, take = 100) {
+    const pageSize = Math.min(take, 100);
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
+
+    return {
+        take: pageSize,
+        startIndex,
+        endIndex,
+        pagination: {
+            ...(startIndex > 0 && {
+                prev: {
+                    page: page - 1,
+                    take: Math.min(pageSize, count)
+                }
+            }),
+            ...(endIndex < count && {
+                next: {
+                    page: page + 1,
+                    take: Math.min(pageSize, count - endIndex)
+                }
+            })
+        }
+    };
+}

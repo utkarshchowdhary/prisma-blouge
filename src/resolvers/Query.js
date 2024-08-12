@@ -3,7 +3,8 @@ import {
     containsFilter,
     createEqualsFilter,
     createContainsFilter,
-    getPostAccessFilter
+    getPostAccessFilter,
+    getPagination
 } from '../utils/filter';
 import getCurrentUserId from '../utils/getCurrentUserId';
 
@@ -19,32 +20,12 @@ const Query = {
 
         const count = await prisma.user.count({ where });
 
-        let startIndex, endIndex;
-        const pagination = {};
-
-        if (args.page && args.take) {
-            startIndex = (args.page - 1) * args.take;
-            endIndex = args.page * args.take;
-
-            if (endIndex < count) {
-                pagination.next = {
-                    page: args.page + 1,
-                    take: args.take
-                };
-            }
-
-            if (startIndex > 0) {
-                pagination.prev = {
-                    page: args.page - 1,
-                    take: args.take
-                };
-            }
-        }
+        const { take, startIndex, pagination } = getPagination(count, args.page, args.take);
 
         const opArgs = {
             where,
             skip: startIndex,
-            take: args.take,
+            take,
             orderBy: args.orderBy
         };
 
@@ -68,32 +49,12 @@ const Query = {
 
         const count = await prisma.post.count({ where });
 
-        let startIndex, endIndex;
-        const pagination = {};
-
-        if (args.page && args.take) {
-            startIndex = (args.page - 1) * args.take;
-            endIndex = args.page * args.take;
-
-            if (endIndex < count) {
-                pagination.next = {
-                    page: args.page + 1,
-                    take: args.take
-                };
-            }
-
-            if (startIndex > 0) {
-                pagination.prev = {
-                    page: args.page - 1,
-                    take: args.take
-                };
-            }
-        }
+        const { take, startIndex, pagination } = getPagination(count, args.page, args.take);
 
         const opArgs = {
             where,
             skip: startIndex,
-            take: args.take,
+            take,
             orderBy: args.orderBy
         };
 
@@ -125,32 +86,12 @@ const Query = {
 
         const count = await prisma.post.count({ where });
 
-        let startIndex, endIndex;
-        const pagination = {};
-
-        if (args.page && args.take) {
-            startIndex = (args.page - 1) * args.take;
-            endIndex = args.page * args.take;
-
-            if (endIndex < count) {
-                pagination.next = {
-                    page: args.page + 1,
-                    take: args.take
-                };
-            }
-
-            if (startIndex > 0) {
-                pagination.prev = {
-                    page: args.page - 1,
-                    take: args.take
-                };
-            }
-        }
+        const { take, startIndex, pagination } = getPagination(count, args.page, args.take);
 
         const opArgs = {
             where,
             skip: startIndex,
-            take: args.take,
+            take,
             orderBy: args.orderBy
         };
 
@@ -173,32 +114,12 @@ const Query = {
 
         const count = await prisma.comment.count({ where });
 
-        let startIndex, endIndex;
-        const pagination = {};
-
-        if (args.page && args.take) {
-            startIndex = (args.page - 1) * args.take;
-            endIndex = args.page * args.take;
-
-            if (endIndex < count) {
-                pagination.next = {
-                    page: args.page + 1,
-                    take: args.take
-                };
-            }
-
-            if (startIndex > 0) {
-                pagination.prev = {
-                    page: args.page - 1,
-                    take: args.take
-                };
-            }
-        }
+        const { take, startIndex, pagination } = getPagination(count, args.page, args.take);
 
         const opArgs = {
             where,
             skip: startIndex,
-            take: args.take,
+            take,
             orderBy: args.orderBy
         };
 
