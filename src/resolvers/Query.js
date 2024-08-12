@@ -11,6 +11,7 @@ const Query = {
     async users(_parent, args, { prisma }) {
         const criteria = createEqualsFilter(args.criteria);
 
+        // Search is prioritized based on name criteria over the search term
         const where = {
             ...(args.searchTerm && containsFilter('name', args.searchTerm)),
             ...criteria
@@ -47,13 +48,7 @@ const Query = {
             orderBy: args.orderBy
         };
 
-        const results = await prisma.user.findMany({
-            ...opArgs,
-            include: {
-                posts: true,
-                comments: true
-            }
-        });
+        const results = await prisma.user.findMany(opArgs);
 
         return {
             count,
@@ -64,6 +59,7 @@ const Query = {
     async posts(_parent, args, { prisma }) {
         const criteria = createEqualsFilter(args.criteria);
 
+        // Search is prioritized based on criteria; fields not included in criteria are searched using the search term if provided
         const where = {
             published: true,
             ...createContainsFilter(criteria, args.searchTerm, ['title', 'body']),
@@ -101,13 +97,7 @@ const Query = {
             orderBy: args.orderBy
         };
 
-        const results = await prisma.post.findMany({
-            ...opArgs,
-            include: {
-                author: true,
-                comments: true
-            }
-        });
+        const results = await prisma.post.findMany(opArgs);
 
         return {
             count,
@@ -126,6 +116,7 @@ const Query = {
 
         const criteria = createEqualsFilter(args.criteria);
 
+        // Search is prioritized based on criteria; searchable fields not included in criteria are searched using the search term if provided
         const where = {
             author: { id: userId },
             ...createContainsFilter(criteria, args.searchTerm, ['title', 'body']),
@@ -163,13 +154,7 @@ const Query = {
             orderBy: args.orderBy
         };
 
-        const results = await prisma.post.findMany({
-            ...opArgs,
-            include: {
-                author: true,
-                comments: true
-            }
-        });
+        const results = await prisma.post.findMany(opArgs);
 
         return {
             count,
@@ -180,6 +165,7 @@ const Query = {
     async comments(_parent, args, { prisma }) {
         const criteria = createEqualsFilter(args.criteria);
 
+        // Search is prioritized based on text criteria over the search term
         const where = {
             ...(args.searchTerm && containsFilter('text', args.searchTerm)),
             ...criteria
@@ -216,13 +202,7 @@ const Query = {
             orderBy: args.orderBy
         };
 
-        const results = await prisma.comment.findMany({
-            ...opArgs,
-            include: {
-                author: true,
-                post: true
-            }
-        });
+        const results = await prisma.comment.findMany(opArgs);
 
         return {
             count,
@@ -237,13 +217,7 @@ const Query = {
             where: getPostAccessFilter(args.id, userId)
         };
 
-        const post = await prisma.post.findFirst({
-            ...opArgs,
-            include: {
-                author: true,
-                comments: true
-            }
-        });
+        const post = await prisma.post.findFirst(opArgs);
 
         if (!post) throw new GraphQLError('Unable to fetch post.');
 
@@ -253,8 +227,7 @@ const Query = {
         const userId = getCurrentUserId(request);
 
         const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: { posts: true, comments: true }
+            where: { id: userId }
         });
 
         if (!user) throw new GraphQLError('User not found.');
