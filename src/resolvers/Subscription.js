@@ -4,7 +4,7 @@ import getCurrentUserId from '../utils/getCurrentUserId';
 const Subscription = {
     post: {
         subscribe(_parent, _args, { pubSub }) {
-            return pubSub.asyncIterator('post');
+            return pubSub.subscribe('post');
         }
     },
     comment: {
@@ -17,7 +17,7 @@ const Subscription = {
 
             if (!post) throw new GraphQLError('Post not found.');
 
-            return pubSub.asyncIterator(`comment ${postId}`);
+            return pubSub.subscribe(`comment ${postId}`);
         }
     },
     myPost: {
@@ -32,7 +32,7 @@ const Subscription = {
 
             if (!user) throw new GraphQLError('User not found.');
 
-            return pubSub.asyncIterator(`post ${userId}`);
+            return pubSub.subscribe(`post ${userId}`);
         }
     }
 };
